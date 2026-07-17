@@ -1,0 +1,37 @@
+name: Build Android APK (debug)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  export-android:
+    name: Export Android debug APK
+    runs-on: ubuntu-24.04
+    container:
+      image: barichello/godot-ci:4.3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Godot
+        run: |
+          mkdir -v -p ~/.local/share/godot/export_templates/
+          mkdir -v -p ~/.config/
+          mv /root/.config/godot ~/.config/godot
+          mv /root/.local/share/godot/export_templates/4.3.stable ~/.local/share/godot/export_templates/4.3.stable
+
+      - name: Import assets (build the .godot cache)
+        run: godot --headless --verbose --editor --quit || true
+
+      - name: Export Android debug APK
+        run: |
+          mkdir -v -p build/android
+          godot --headless --verbose --export-debug "Android" "$(pwd)/build/android/plateforme-mobile-debug.apk"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: plateforme-mobile-debug-apk
+          path: build/android/plateforme-mobile-debug.apk

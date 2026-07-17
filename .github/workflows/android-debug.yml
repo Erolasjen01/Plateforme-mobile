@@ -25,6 +25,11 @@ jobs:
       - name: Import assets (build the .godot cache)
         run: godot --headless --verbose --editor --quit || true
 
+      - name: Generate debug keystore
+        run: |
+          keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore /tmp/debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 9999
+          sed -i 's@keystore/debug=".*"@keystore/debug="/tmp/debug.keystore"@' export_presets.cfg
+
       - name: Export Android debug APK
         run: |
           mkdir -v -p build/android

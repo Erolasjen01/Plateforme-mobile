@@ -29,6 +29,9 @@ jobs:
         run: |
           keytool -keyalg RSA -genkeypair -alias androiddebugkey -keypass android -keystore /tmp/debug.keystore -storepass android -dname "CN=Android Debug,O=Android,C=US" -validity 9999
           sed -i 's@keystore/debug=".*"@keystore/debug="/tmp/debug.keystore"@' export_presets.cfg
+          echo "--- Verification ---"
+          ls -l /tmp/debug.keystore
+          grep "keystore/debug" export_presets.cfg
 
       - name: Export Android debug APK
         run: |

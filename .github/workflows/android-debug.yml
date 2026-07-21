@@ -22,6 +22,27 @@ jobs:
           mv /root/.config/godot ~/.config/godot
           mv /root/.local/share/godot/export_templates/4.3.stable ~/.local/share/godot/export_templates/4.3.stable
 
+      - name: Diagnostics
+        run: |
+          echo "HOME=$HOME"
+          echo "--- ~/.config/godot ---"
+          ls -la ~/.config/godot 2>&1 || echo "MISSING ~/.config/godot"
+          echo "--- editor settings files ---"
+          find ~/.config/godot -type f 2>&1
+          echo "--- android/adb/java lines inside editor settings ---"
+          grep -ri "android_sdk\|adb\|java_sdk" ~/.config/godot -r 2>&1 || echo "not found in editor settings"
+          echo "--- searching for android sdk dirs ---"
+          find / -maxdepth 6 -iname "*android-sdk*" 2>/dev/null
+          echo "--- searching for adb binary ---"
+          find / -iname "adb" -type f 2>/dev/null
+          echo "--- searching for build-tools ---"
+          find / -maxdepth 6 -iname "build-tools" 2>/dev/null
+          echo "--- export templates present ---"
+          find ~/.local/share/godot/export_templates -maxdepth 2 2>&1
+          echo "--- java ---"
+          which java 2>&1 || echo "no java in PATH"
+          java -version 2>&1 || true
+
       - name: Import assets (build the .godot cache)
         run: godot --headless --verbose --editor --quit || true
 
